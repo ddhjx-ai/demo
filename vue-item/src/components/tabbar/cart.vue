@@ -1,25 +1,23 @@
 <template>
   <div>
     <ul>
-      <li v-for="item in msg" :key="item.id">
+      <li v-for="(item,i) in msg" :key="item.id">
         <table>
           <tr>
             <td width='20%'>
-              <div class="mui-switch mui-switch-mini">
-                <div class="mui-switch-handle"></div>
-              </div>
+              <mt-switch v-model='$store.getters.getById.sele[item.id]' @change="changeSele(item.id,$store.getters.getById.sele[item.id])"></mt-switch>
             </td>
             <td width='20%'>
               <img :src="item.thumb_path" alt />
             </td>
-            <td width='60%'>
+            <td width='50%'>
               <h5>{{item.title}}</h5>
               <span>￥{{item.sell_price}}</span>
-              <div class="mui-numbox">
-                <button class="mui-btn mui-btn-numbox-minus" type="button">-</button>
-                <input class="mui-input-numbox" type="number" :value="item.cou" />
-                <button class="mui-btn mui-btn-numbox-plus" type="button">+</button>
-              </div>
+              <!-- 数字输入框 -->
+              <catnum :numCount="$store.getters.getById.num[item.id]" @changNum="numChange" :id='item.id'></catnum>
+            </td>
+            <td>
+              <a href="#" width="10%" @click.prevent="remove(i,item.id)">删除</a>
             </td>
           </tr>
         </table>
@@ -31,8 +29,8 @@
               <p>总计(不含运费)</p>
               <p>
                 已勾选商品
-                <span>{{total}} </span>件，总价
-                <span>￥{{price}}</span>
+                <span>{{getNum}} </span>件，总价
+                <span>￥{{getTotal}}</span>
               </p>
             </td>
             <td>
@@ -46,19 +44,41 @@
 </template>
 
 <script>
+import catnum from '../comments/cartNum.vue'
 export default {
   methods: {
     getData() {
-      this.$axios.get("/api/goods/getshopcarlist/87,88,89").then(res => {
-        console.log(res);
+      let ids = []
+      this.$store.state.cart.forEach(item => ids.push(item.id))
+      this.$axios.get("/api/goods/getshopcarlist/"+ids.join(',')).then(res => {
         if (res.data.status === 0) {
-          this.msg = res.data.message;
+          this.msg = res.data.message; 
         }
       });
+    },
+
+    // 删除对应的商品
+    remove(i,id){
+      // 删除页面的数据
+      this.msg.splice(i,1)
+      // 删除仓库的数据
+      this.$store.commit('removeById',id);
+    },
+
+    // 更新商品的选中状态
+    changeSele(id,selected){
+      // 将状态更新到仓库中
+      this.$store.commit('updateSele',{id:id,sele:selected})
+    },
+
+    // 更新数量
+    numChange(num,id){
+      this.$store.commit('changeCount',{num:num,id:id})
     }
   },
   created() {
     this.getData();
+    this.numChange()
   },
   data() {
     return {
@@ -66,7 +86,24 @@ export default {
       total: 0,
       price:0
     };
-  }
+  },
+  components:{
+    catnum
+  },
+  computed: {
+    getNum(){
+      let arr = this.$store.state.cart.filter(item => item.flag)
+      return arr.reduce((sum,item)=>{
+        return sum+=parseInt(item.count)
+      },0)
+    },
+    getTotal(){
+      let arr = this.$store.state.cart.filter(item => item.flag)
+      return arr.reduce((sum,item)=>{
+        return sum+=(item.count*item.price)
+      },0)
+    }
+  },
 };
 </script>
 

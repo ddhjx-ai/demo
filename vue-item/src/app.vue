@@ -2,7 +2,7 @@
   <div class="app_container">
     <!-- 设置头部公共部分 -->
     <mt-header fixed title="shop">
-      <mt-button icon="back" slot="left" @click='back'>返回</mt-button>
+      <mt-button icon="back" slot="left" @click='back' v-show='flag'>返回</mt-button>
     </mt-header>
 
     <!-- 将路由在主模板上渲染 -->
@@ -21,7 +21,7 @@
 				<span class="mui-tab-label">会员</span>
 			</router-link>
 			<router-link class="my-tab-item" to="/cart">
-				<span class="mui-icon mui-icon-extra mui-icon-extra-cart"><span class="mui-badge">9</span></span>
+				<span class="mui-icon mui-icon-extra mui-icon-extra-cart"><span class="mui-badge" >{{getNumber}}</span></span>
 				<span class="mui-tab-label">购物车</span>
 			</router-link>
 			<router-link class="my-tab-item" to="/search">
@@ -37,12 +37,28 @@ export default {
   name:'app',
   data(){
     return {
-      hash:''
+      flag:true
     }
   },
   methods: {
     back(){
-      window.history.back()
+      this.$router.back()
+    }
+  },
+  created() {
+    this.$route.path === '/home' ? this.flag = false : this.flag = true
+  },
+  // 设置 watch ,监听路由的改变
+  watch: {
+    "$route.path":function(newVal,oldVal){
+      newVal === '/home' ? this.flag = false : this.flag = true
+    }
+  },
+  computed: {
+    getNumber() {
+      return this.$store.state.cart.reduce((temp, item) => {
+        return (temp += item.count);
+      }, 0);
     }
   },
 }

@@ -7,7 +7,7 @@
       </mt-swipe-item>
     </mt-swipe> -->
 
-    <banner :list='list'></banner>
+    <banner :list='list' :flag="true"></banner>
 
     <!--  -->
     <ul class="mui-table-view mui-grid-view mui-grid-9">
@@ -61,13 +61,19 @@ export default {
     };
   },
   methods: {
-    getbanner() {
+    /* getbanner() {
       this.$axios.get("/api/getlunbo").then(res => {
         if (res.status === 200) {
           this.list = res.data.message;
         }
       });
-    },
+    }, */
+
+    getbanner(){
+      this.$http.get('/api/getlunbo').then(res => {
+        this.list = res.message
+      })
+    }
   },
   created() {
     this.getbanner();

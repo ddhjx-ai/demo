@@ -55,7 +55,6 @@ export default {
 
     getimgs() {
       this.$axios.get("/api/getimages/0").then(res => {
-        console.log(res);
         if (res.data.status === 0) {
           this.imglist = res.data.message;
         }
@@ -64,7 +63,6 @@ export default {
 
     getimages(id) {
       this.$axios.get('/api/getimages/'+id).then(res => {
-        console.log(res);
         if (res.data.status === 0) {
           this.imglist = res.data.message;
         }

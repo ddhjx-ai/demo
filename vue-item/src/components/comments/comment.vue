@@ -50,14 +50,18 @@ export default {
       if (!this.msg.trim()) {
         return this.toast("内容不能为空");
       }
-      this.$axios
+      /* this.$axios
         .post("api/postcomment/" + this.id, { content: this.msg.trim() })
         .then(res => {
           if (res.data.status === 0) {
             this.getComments();
             this.msg = "";
           }
-        });
+        }); */
+      this.$http.post("api/postcomment/"+this.id,{content:this.msg.trim()}).then(res => {
+        this.getComments();
+        this.msg = ""
+      })
     },
     getMore() {
       this.pageindex++;

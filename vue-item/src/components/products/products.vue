@@ -2,10 +2,14 @@
   <div class="imgbox">
     <ul>
       <li v-for="item in productList" :key="item.id">
-        <router-link :to="'/home/productInfo?id='+item.id">
+        <!-- <router-link :to="'/home/productInfo?id='+item.id" tag='a'>
           <img :src="item.img_url" alt="图片未找到"/>
           <h5>{{item.title}}</h5>
-        </router-link>
+        </router-link> -->
+        <a @click="goTo(item.id)" tag='a'>
+          <img :src="item.img_url" alt="图片未找到"/>
+          <h5>{{item.title}}</h5>
+        </a>
         <div>
           <p>
             <span>￥{{item.sell_price}}</span>
@@ -46,6 +50,15 @@ export default {
           this.productList = this.productList.concat(res.data.message)
         }
       });
+    },
+
+    goTo(id){ // 点击跳转到详情页面,通过$router对象
+      // 方法一：直接传路由地址
+      // this.$router.push('/home/productInfo?id='+id)
+      // 方法二：传递路由地址对象
+      // this.$router.push({path:'/home/productInfo?id='+id})
+      // 方法三：带查询参数,path后面是跳转的页面的name名,query和params的方式不同
+      this.$router.push({path:'productinfo',query:{id:id}})
     }
   },
   created() {
